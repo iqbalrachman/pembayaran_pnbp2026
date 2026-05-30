@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard PNBP BMKG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ LOADER ═══════════════════════════════════ -->
+<div id="loader" class="loader-overlay">
+  <div class="loader-inner">
+    <div class="loader-logo">
+      <span>B</span><span>M</span><span>K</span><span>G</span>
+    </div>
+    <div class="loader-progress">
+      <div class="loader-bar" id="loader-bar"></div>
+    </div>
+    <p class="loader-msg" id="loader-msg">Menginisialisasi sistem...</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ SIDEBAR ══════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-orb">
+      <i class="ph-fill ph-cloud-lightning"></i>
+    </div>
+    <div>
+      <p class="brand-title">PNBP</p>
+      <p class="brand-sub">BMKG</p>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="nav-link active" data-target="sec-overview" href="#">
+      <i class="ph ph-squares-four"></i><span>Overview</span>
+    </a>
+    <a class="nav-link" data-target="sec-kl" href="#">
+      <i class="ph ph-buildings"></i><span>Satker / KL</span>
+    </a>
+    <a class="nav-link" data-target="sec-ntpn" href="#">
+      <i class="ph ph-barcode"></i><span>NTPN</span>
+    </a>
+    <a class="nav-link" data-target="sec-wajib" href="#">
+      <i class="ph ph-users-three"></i><span>Wajib Bayar</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-foot">
+    <div class="conn-status" id="conn-status">
+      <span class="conn-dot" id="conn-dot"></span>
+      <span id="conn-label">Menghubungkan...</span>
+    </div>
+    <p class="foot-copy" id="foot-unit">Biro Perencanaan BMKG</p>
+    <p class="foot-copy muted" id="foot-src">Sumber: SIMPONI-V2</p>
+  </div>
+</aside>
+
+<!-- ════════════════════════════════ MAIN CONTENT ════════════════════════════════ -->
+<main class="main" id="main-scroll">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburger"><i class="ph ph-list"></i></button>
+      <div>
+        <h1 class="topbar-title" id="topbar-title">Dashboard Pembayaran PNBP</h1>
+        <p class="topbar-sub" id="topbar-sub">Badan Meteorologi, Klimatologi dan Geofisika</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="searchbox">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" id="global-search" placeholder="Cari data..." />
+      </div>
+      <div class="filter-tabs" id="date-filter">
+        <button class="ftab" data-f="Day">Hari</button>
+        <button class="ftab active" data-f="Month">Bulan</button>
+        <button class="ftab" data-f="Year">Tahun</button>
+      </div>
+      <button class="icon-btn" id="export-btn" title="Export CSV">
+        <i class="ph ph-download-simple"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- PAGE BODY -->
+  <div class="page-body">
+
+    <!-- ─────────────────── SECTION: OVERVIEW ─────────────────── -->
+    <section id="sec-overview" class="section scroll-target">
+
+      <!-- Hero -->
+      <div class="hero-row">
+        <div class="hero-card idr-card">
+          <p class="hero-eyebrow"><i class="ph-fill ph-currency-circle-dollar"></i> Total Penerimaan IDR</p>
+          <h2 class="hero-value" id="h-idr">Rp 0</h2>
+          <p class="hero-hint" id="h-idr-sub">0 transaksi</p>
+        </div>
+        <div class="hero-card usd-card">
+          <p class="hero-eyebrow"><i class="ph-fill ph-globe-hemisphere-west"></i> Total Penerimaan USD</p>
+          <h2 class="hero-value" id="h-usd">$ 0</h2>
+          <p class="hero-hint" id="h-usd-sub">0 transaksi</p>
+        </div>
+      </div>
+
+      <!-- KPI Strip -->
+      <div class="kpi-strip">
+        <div class="kpi-card">
+          <div class="kpi-icon i-blue"><i class="ph ph-receipt"></i></div>
+          <div><p class="kpi-lbl">Total Transaksi</p><h3 class="kpi-val" id="kv-tx">0</h3></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon i-green"><i class="ph ph-stack"></i></div>
+          <div><p class="kpi-lbl">Total Volume</p><h3 class="kpi-val" id="kv-vol">0</h3></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon i-amber"><i class="ph ph-calculator"></i></div>
+          <div><p class="kpi-lbl">Rata-rata Transaksi</p><h3 class="kpi-val" id="kv-avg">Rp 0</h3></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon i-slate"><i class="ph ph-buildings"></i></div>
+          <div><p class="kpi-lbl">Entitas Aktif</p><h3 class="kpi-val" id="kv-ent">0</h3></div>
+        </div>
+      </div>
+
+      <!-- Chart Row 1 -->
+      <div class="chart-row">
+        <div class="card chart-card wide">
+          <div class="card-hd">
+            <h3>Tren Revenue &amp; Volume</h3>
+            <span class="tag">Log Scale</span>
+          </div>
+          <div class="chart-body" id="cht-trend"></div>
+        </div>
+        <div class="card chart-card">
+          <div class="card-hd"><h3>Kekuatan Produk</h3></div>
+          <div class="chart-body" id="cht-bar"></div>
+        </div>
+      </div>
+
+      <!-- Chart Row 2 -->
+      <div class="chart-row three-col">
+        <div class="card chart-card">
+          <div class="card-hd"><h3>Revenue by Akun</h3></div>
+          <div class="chart-body" id="cht-pie"></div>
+        </div>
+        <div class="card chart-card">
+          <div class="card-hd"><h3>Tracking Performa</h3><span class="tag">Log Scale</span></div>
+          <div class="chart-body" id="cht-perf"></div>
+        </div>
+        <div class="card top-card">
+          <div class="card-hd"><h3>Entitas Terbaik</h3></div>
+          <div class="top-body">
+            <div class="trophy"><i class="ph-fill ph-trophy"></i></div>
+            <span class="rank-badge">#1 Revenue Tertinggi</span>
+            <h4 class="top-name" id="top-name">—</h4>
+            <p class="top-hint" id="top-desc">Memuat data...</p>
+            <div class="top-stats">
+              <div><p class="ts-lbl">Kontribusi</p><p class="ts-val" id="top-val">Rp 0</p></div>
+              <div><p class="ts-lbl">Transaksi</p><p class="ts-val" id="top-cnt">0</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transactions Table -->
+      <div class="card tbl-card">
+        <div class="card-hd">
+          <h3>Transaksi Terkini</h3>
+          <div class="tbl-tools">
+            <select id="tbl-filter" class="sel"><option value="all">Semua Mata Uang</option><option value="IDR">IDR</option><option value="USD">USD</option></select>
+            <button class="btn-export" id="export-btn2"><i class="ph ph-download-simple"></i> Export CSV</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="dtbl">
+            <thead>
+              <tr>
+                <th style="width:20%">Wajib Bayar</th>
+                <th style="width:12%">Tanggal</th>
+                <th style="width:20%">NTPN</th>
+                <th style="width:8%">Akun</th>
+                <th style="width:25%">Keterangan</th>
+                <th style="width:15%;text-align:right">Revenue</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────── SECTION: SATKER / KL ─────────────────── -->
+    <section id="sec-kl" class="section scroll-target">
+      <div class="sec-head">
+        <div class="sec-icon" style="--ic:#228B22"><i class="ph-fill ph-buildings"></i></div>
+        <div><h2>Kode KL / Unit / Satker</h2><p>Analitik performa per unit kerja</p></div>
+      </div>
+      <div class="kpi-strip kpi-4">
+        <div class="kpi-card"><div class="kpi-icon i-green"><i class="ph ph-buildings"></i></div><div><p class="kpi-lbl">Satker Aktif</p><h3 class="kpi-val" id="kl-k1">0</h3></div></div>
+        <div class="kpi-card"><div class="kpi-icon i-blue"><i class="ph ph-chart-line-up"></i></div><div><p class="kpi-lbl">Rata-rata Revenue/Unit</p><h3 class="kpi-val" id="kl-k2">Rp 0</h3></div></div>
+        <div class="kpi-card span2"><div class="kpi-icon i-amber"><i class="ph ph-star"></i></div><div><p class="kpi-lbl">Unit Terbaik</p><h3 class="kpi-val truncate" id="kl-k3">—</h3></div></div>
+      </div>
+      <div class="chart-row">
+        <div class="card chart-card wide">
+          <div class="card-hd"><h3>Tren Performa Unit</h3><span class="tag">Log Scale</span></div>
+          <div class="chart-body" id="cht-kl"></div>
+        </div>
+        <div class="card tbl-sm">
+          <div class="card-hd"><h3>Detail Satker</h3></div>
+          <div class="tbl-wrap scrollable">
+            <table class="dtbl xs"><thead><tr><th>Kode KL / Unit</th><th>Txn</th><th class="tr">Revenue</th></tr></thead><tbody id="tbl-kl"></tbody></table>
+          </div>
+          <div class="pager" id="pg-kl"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────── SECTION: NTPN ─────────────────── -->
+    <section id="sec-ntpn" class="section scroll-target">
+      <div class="sec-head">
+        <div class="sec-icon" style="--ic:#0000CD"><i class="ph-fill ph-barcode"></i></div>
+        <div><h2>Analisis NTPN</h2><p>Distribusi dan performa per NTPN</p></div>
+      </div>
+      <div class="kpi-strip kpi-4">
+        <div class="kpi-card"><div class="kpi-icon i-blue"><i class="ph ph-barcode"></i></div><div><p class="kpi-lbl">Total NTPN Unik</p><h3 class="kpi-val" id="nt-k1">0</h3></div></div>
+        <div class="kpi-card span2"><div class="kpi-icon i-green"><i class="ph ph-arrow-up"></i></div><div><p class="kpi-lbl">Volume Tertinggi</p><h3 class="kpi-val truncate" id="nt-k2">—</h3></div></div>
+        <div class="kpi-card"><div class="kpi-icon i-red"><i class="ph ph-warning"></i></div><div><p class="kpi-lbl">Outlier</p><h3 class="kpi-val red" id="nt-k3">0</h3></div></div>
+      </div>
+      <div class="chart-row">
+        <div class="card chart-card wide">
+          <div class="card-hd"><h3>Distribusi NTPN (IDR &amp; USD)</h3></div>
+          <div class="chart-body" id="cht-ntpn"></div>
+        </div>
+        <div class="card tbl-sm">
+          <div class="card-hd"><h3>Detail NTPN</h3></div>
+          <div class="tbl-wrap scrollable">
+            <table class="dtbl xs"><thead><tr><th>NTPN</th><th>Txn</th><th class="tr">Revenue</th></tr></thead><tbody id="tbl-ntpn"></tbody></table>
+          </div>
+          <div class="pager" id="pg-ntpn"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────── SECTION: WAJIB BAYAR ─────────────────── -->
+    <section id="sec-wajib" class="section scroll-target">
+      <div class="sec-head">
+        <div class="sec-icon" style="--ic:#6b7280"><i class="ph-fill ph-users-three"></i></div>
+        <div><h2>Segmentasi Wajib Bayar</h2><p>Analisis kontribusi per entitas pembayar</p></div>
+      </div>
+      <div class="chart-row">
+        <div class="flex-col" style="flex:5">
+          <div class="kpi-strip kpi-2">
+            <div class="kpi-card"><div class="kpi-icon i-slate"><i class="ph ph-users"></i></div><div><p class="kpi-lbl">Total Pembayar Unik</p><h3 class="kpi-val" id="wb-k1">0</h3></div></div>
+            <div class="kpi-card"><div class="kpi-icon i-blue"><i class="ph ph-crown-simple"></i></div><div><p class="kpi-lbl">Kontributor Terbesar</p><h3 class="kpi-val truncate" id="wb-k2">—</h3></div></div>
+          </div>
+          <div class="card chart-card" style="flex:1;min-height:260px">
+            <div class="card-hd"><h3>Segmentasi Wajib Bayar</h3></div>
+            <div class="chart-body" id="cht-wajib"></div>
+          </div>
+        </div>
+        <div class="card tbl-sm" style="flex:5">
+          <div class="card-hd"><h3>Detail Segmentasi</h3></div>
+          <div class="tbl-wrap scrollable">
+            <table class="dtbl xs"><thead><tr><th>Wajib Bayar</th><th>Txn</th><th class="tr">Revenue</th></tr></thead><tbody id="tbl-wajib"></tbody></table>
+          </div>
+          <div class="pager" id="pg-wajib"></div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /page-body -->
+</main>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
