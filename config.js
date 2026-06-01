@@ -9,7 +9,7 @@ const CONFIG = {
    * URL Google Apps Script Web App Anda.
    * Ganti dengan URL deploy terbaru Anda dari Apps Script.
    */
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxYdaDmYZUSku8mrGPyktlCZRr-Xt2qy2C5UHofJ7vqMcAn50_T6leg6r0W0c3_nYsc/exec",
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbw76CDPCPF02rLa1_iR4lTKCOPN5bNUR5RG952AOnagf2ROWO6U2LxoLCeiuQP7V0H1pg/exec",
 
   /**
    * Judul dashboard yang tampil di browser tab & header
