@@ -360,7 +360,7 @@
                                  <tbody id="table-kl-body" class="divide-y divide-gray-100 text-gray-700"></tbody>
                              </table>
                          </div>
-                         <div class="mt-2 flex justify-between items-center text-xs text-gray-500 border-t pt-3" id="kl-pagination"></div>
+                         <div class="mt-4 border-t pt-3" id="kl-pagination"></div>
                      </div>
                 </div>
             </section>
@@ -405,7 +405,7 @@
                                  <tbody id="table-ntpn-body" class="divide-y divide-gray-100 text-gray-700"></tbody>
                              </table>
                          </div>
-                         <div class="mt-2 flex justify-between items-center text-xs text-gray-500 border-t pt-3" id="ntpn-pagination"></div>
+                         <div class="mt-4 border-t pt-3" id="ntpn-pagination"></div>
                      </div>
                 </div>
             </section>
@@ -445,7 +445,7 @@
                                  <tbody id="table-wajib-body" class="divide-y divide-gray-100 text-gray-700"></tbody>
                              </table>
                          </div>
-                         <div class="mt-2 flex justify-between items-center text-xs text-gray-500 border-t pt-3" id="wajib-pagination"></div>
+                         <div class="mt-4 border-t pt-3" id="wajib-pagination"></div>
                      </div>
                 </div>
             </section>
@@ -555,9 +555,16 @@
             safeScale(val) { return Math.max(1, val); }
         };
 
+        // Memformat eksponensial dengan unicode superscript yang rapi (misal: 1.0 x 10⁵)
         const formatExponential = (value) => {
-            if (value === 0 || value === 1) return '0';
-            return Number(value).toExponential(1);
+            if (value === 0) return '0';
+            if (value === 1) return '10⁰';
+            const parts = Number(value).toExponential(1).split('e');
+            const base = parts[0];
+            const exponent = parseInt(parts[1], 10);
+            const superscriptMap = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','+':'⁺','-':'⁻'};
+            const exponentStr = exponent.toString().split('').map(c => superscriptMap[c] || c).join('');
+            return `${base} × 10${exponentStr}`;
         };
 
         window.tableInstances = {};
@@ -597,17 +604,21 @@
                 let pages = '';
                 for(let i = 1; i <= this.totalPages; i++) {
                     if(i === 1 || i === this.totalPages || (i >= this.currentPage - 1 && i <= this.currentPage + 1)) {
-                        pages += `<button class="px-2 py-1 mx-0.5 text-xs ${i === this.currentPage ? 'bg-[#0000CD] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} rounded transition" onclick="window.tableInstances['${this.tableId}'].goToPage(${i})">${i}</button>`;
+                        pages += `<button class="w-7 h-7 flex items-center justify-center text-xs font-medium ${i === this.currentPage ? 'bg-[#0000CD] text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'} rounded transition" onclick="window.tableInstances['${this.tableId}'].goToPage(${i})">${i}</button>`;
                     } else if(i === this.currentPage - 2 || i === this.currentPage + 2) {
                         pages += `<span class="px-1 text-gray-400 text-xs">...</span>`;
                     }
                 }
                 this.paginationContainer.innerHTML = `
-                    <span class="text-xs text-gray-500">Total ${this.data.length} records</span>
-                    <div class="flex items-center">
-                        <button class="px-2 py-1 mx-0.5 text-xs bg-gray-100 rounded text-gray-700 disabled:opacity-50 hover:bg-gray-200 transition" ${this.currentPage === 1 ? 'disabled' : ''} onclick="window.tableInstances['${this.tableId}'].changePage(-1)">Prev</button>
-                        ${pages}
-                        <button class="px-2 py-1 mx-0.5 text-xs bg-gray-100 rounded text-gray-700 disabled:opacity-50 hover:bg-gray-200 transition" ${this.currentPage === this.totalPages ? 'disabled' : ''} onclick="window.tableInstances['${this.tableId}'].changePage(1)">Next</button>
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 w-full">
+                        <span class="text-xs text-gray-500">Halaman <strong class="text-gray-800">${this.currentPage}</strong> dari <strong class="text-gray-800">${this.totalPages}</strong> (Total ${this.data.length} baris)</span>
+                        <div class="flex items-center gap-1">
+                            <button class="px-2 py-1 h-7 flex items-center text-xs bg-white border border-gray-200 rounded text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition" ${this.currentPage === 1 ? 'disabled' : ''} onclick="window.tableInstances['${this.tableId}'].changePage(-1)">Prev</button>
+                            <div class="flex items-center gap-1 mx-2">
+                                ${pages}
+                            </div>
+                            <button class="px-2 py-1 h-7 flex items-center text-xs bg-white border border-gray-200 rounded text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition" ${this.currentPage === this.totalPages ? 'disabled' : ''} onclick="window.tableInstances['${this.tableId}'].changePage(1)">Next</button>
+                        </div>
                     </div>
                 `;
             }
@@ -720,8 +731,19 @@
             });
         });
 
-        // Mock data
-        const MOCK_DATA = [{"NAMA WAJIB BAYAR / SETOR":"PERUM LPPNPI","TANGGAL BAYAR":"2026-01-07","KODE KL/UNIT/SATKER":"436766 - SEKRETARIAT UTAMA BMKG","NTPN":"Informasi Cuaca","KODE AKUN":"425433","SETORAN PER AKUN":"420283.45","MATA UANG":"USD","VOLUME":"10507086.25","KETERANGAN":"PNBP USD"}];
+        // Dataset Mockup diperbarui dari Book1.csv lengkap dengan variasi USD dan IDR
+        const MOCK_DATA = [
+            {"NAMA WAJIB BAYAR / SETOR":"PERUM LPPNPI","TANGGAL BAYAR":"2026-01-07","KODE KL/UNIT/SATKER":"436766 - SEKRETARIAT UTAMA BMKG","NTPN":"Informasi Cuaca untuk Penerbangan","KODE AKUN":"425433","SETORAN PER AKUN":420283.45,"MATA UANG":"USD","VOLUME":10507086.25,"KETERANGAN":"PNBP BMKG USD Okt 2025"},
+            {"NAMA WAJIB BAYAR / SETOR":"PERUM LPPNPI","TANGGAL BAYAR":"2026-01-15","KODE KL/UNIT/SATKER":"436766 - SEKRETARIAT UTAMA BMKG","NTPN":"Informasi Cuaca untuk Penerbangan","KODE AKUN":"425433","SETORAN PER AKUN":482234.67,"MATA UANG":"USD","VOLUME":12055866.75,"KETERANGAN":"PNBP USD November 2025"},
+            {"NAMA WAJIB BAYAR / SETOR":"Stasiun Meteorologi Balikpapan","TANGGAL BAYAR":"2026-01-01","KODE KL/UNIT/SATKER":"437174 - STASIUN METEOROLOGI SULTAN AJI MUHAMMAD SULAIMAN SEPINGGAN","NTPN":"Informasi Tabular dan Grafik Maritim","KODE AKUN":"425433","SETORAN PER AKUN":700000,"MATA UANG":"IDR","VOLUME":2,"KETERANGAN":"CV FAJAR NUR JAYA NOVEMBER DAN DESEMBER 2025"},
+            {"NAMA WAJIB BAYAR / SETOR":"Stasiun Klimatologi Lampung","TANGGAL BAYAR":"2026-01-02","KODE KL/UNIT/SATKER":"663839 - STASIUN KLIMATOLOGI LAMPUNG","NTPN":"Informasi Meteorologi Khusus Untuk Pendukung Kegiatan Proyek","KODE AKUN":"425433","SETORAN PER AKUN":3750000,"MATA UANG":"IDR","VOLUME":1,"KETERANGAN":"Permohonan Prakiraan Informasi Iklim Pekerjaan Pembangunan..."},
+            {"NAMA WAJIB BAYAR / SETOR":"PT. TRANS YEONG MARITIME","TANGGAL BAYAR":"2026-01-02","KODE KL/UNIT/SATKER":"663818 - STASIUN METEOROLOGI MARITIM KENDARI","NTPN":"Informasi Cuaca Untuk Pelabuhan","KODE AKUN":"425433","SETORAN PER AKUN":1575000,"MATA UANG":"IDR","VOLUME":7,"KETERANGAN":"PT. TRANS YEONG MARITIME"},
+            {"NAMA WAJIB BAYAR / SETOR":"PT. INDOJAYAAGRINUSA","TANGGAL BAYAR":"2026-01-02","KODE KL/UNIT/SATKER":"436936 - STASIUN METEOROLOGI SULTAN ISKANDAR MUDA","NTPN":"Informasi Meteorologi (asuransi)","KODE AKUN":"425433","SETORAN PER AKUN":1050000,"MATA UANG":"IDR","VOLUME":6,"KETERANGAN":"Penerbitan data cuaca Klaim Asuransi"},
+            {"NAMA WAJIB BAYAR / SETOR":"Bustan, S.Si, M.Sc,","TANGGAL BAYAR":"2026-01-02","KODE KL/UNIT/SATKER":"663843 - STASIUN KLIMATOLOGI NUSA TENGGARA BARAT","NTPN":"Informasi Meteorologi Khusus Untuk Pendukung Kegiatan Proyek","KODE AKUN":"425433","SETORAN PER AKUN":3750000,"MATA UANG":"IDR","VOLUME":1,"KETERANGAN":""},
+            {"NAMA WAJIB BAYAR / SETOR":"PERUM LPPNPI","TANGGAL BAYAR":"2026-02-13","KODE KL/UNIT/SATKER":"436766 - SEKRETARIAT UTAMA BMKG","NTPN":"Informasi Cuaca untuk Penerbangan","KODE AKUN":"425433","SETORAN PER AKUN":459760.23,"MATA UANG":"USD","VOLUME":11494005.75,"KETERANGAN":"PNBP BMKG USD DES 2025"},
+            {"NAMA WAJIB BAYAR / SETOR":"PERUM LPPNPI","TANGGAL BAYAR":"2026-02-27","KODE KL/UNIT/SATKER":"436766 - SEKRETARIAT UTAMA BMKG","NTPN":"Informasi Cuaca untuk Penerbangan","KODE AKUN":"425433","SETORAN PER AKUN":536027.37,"MATA UANG":"USD","VOLUME":13400684.25,"KETERANGAN":"PNBP BMKG USD JAN 2026"},
+            {"NAMA WAJIB BAYAR / SETOR":"PERUM LPPNPI","TANGGAL BAYAR":"2026-04-16","KODE KL/UNIT/SATKER":"436766 - SEKRETARIAT UTAMA BMKG","NTPN":"Informasi Cuaca untuk Penerbangan","KODE AKUN":"425433","SETORAN PER AKUN":456874.12,"MATA UANG":"USD","VOLUME":11421853,"KETERANGAN":"PNBP BMKG USD FEB 2026"}
+        ];
 
         let charts = {};
         function initCharts() {
@@ -786,10 +808,28 @@
 
                 const dates = Object.keys(dateMap).sort();
                 charts.focusArea.setOption({
-                    tooltip: { trigger: 'axis' }, legend: { data: ['Revenue', 'Volume'], bottom: 0 },
+                    tooltip: { 
+                        trigger: 'axis',
+                        backgroundColor: 'rgba(255,255,255,0.95)',
+                        formatter: function (params) {
+                            let result = `<div class="font-bold border-b pb-1 mb-2 text-gray-800">${params[0].name}</div>`;
+                            params.forEach(p => {
+                                let valStr = p.seriesName === 'Volume' ? formatNumber(p.data) : formatIDR(p.data);
+                                result += `<div class="flex justify-between items-center gap-4 text-sm">
+                                            <span>${p.marker} ${p.seriesName}</span>
+                                            <b class="text-gray-900">${valStr}</b>
+                                           </div>`;
+                            });
+                            return result;
+                        }
+                    },
+                    legend: { data: ['Revenue', 'Volume'], bottom: 0 },
                     grid: { top: '5%', left: '8%', right: '8%', bottom: '15%', containLabel: true },
                     xAxis: { type: 'category', boundaryGap: false, data: dates },
-                    yAxis: [ { type: 'log', logBase: 10, axisLabel: { formatter: formatExponential } }, { type: 'log', logBase: 10, show: false } ],
+                    yAxis: [ 
+                        { type: 'log', logBase: 10, axisLabel: { formatter: formatExponential } }, 
+                        { type: 'log', logBase: 10, show: false } 
+                    ],
                     color: ['#0000CD', '#228B22'],
                     series: [
                         { name: 'Revenue', type: 'line', data: dates.map(d => DataEngine.safeScale(dateMap[d].rev)), areaStyle:{opacity:0.2}, yAxisIndex: 0 },
@@ -798,23 +838,56 @@
                 });
 
                 charts.focusCol.setOption({
-                    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                    tooltip: { 
+                        trigger: 'axis', 
+                        axisPointer: { type: 'shadow' },
+                        backgroundColor: 'rgba(255,255,255,0.95)',
+                        formatter: function(params) {
+                            return `<div class="font-bold border-b pb-1 mb-2 text-gray-800">${params[0].name}</div>
+                                    <div class="flex justify-between items-center gap-4 text-sm">
+                                        <span>${params[0].marker} Total Revenue</span>
+                                        <b class="text-gray-900">${formatIDR(params[0].data)}</b>
+                                    </div>`;
+                        }
+                    },
                     grid: { top: '5%', left: '3%', right: '4%', bottom: '5%', containLabel: true },
                     xAxis: { type: 'category', data: sortedEntities.slice(0,10).map(e => e[0].substring(0,10)+'...'), axisLabel: { interval: 0, rotate: 30 } },
-                    yAxis: { type: 'value' }, color: ['#228B22'],
-                    series: [{ type: 'bar', data: sortedEntities.slice(0,10).map(e => e[1].totalRev), itemStyle: { borderRadius: [4, 4, 0, 0] } }]
+                    yAxis: { type: 'log', logBase: 10, axisLabel: { formatter: formatExponential } }, 
+                    color: ['#228B22'],
+                    series: [{ type: 'bar', data: sortedEntities.slice(0,10).map(e => DataEngine.safeScale(e[1].totalRev)), itemStyle: { borderRadius: [4, 4, 0, 0] } }]
                 });
 
                 charts.analysisPie.setOption({
-                    tooltip: { trigger: 'item' }, legend: { bottom: '0', icon: 'circle' },
+                    tooltip: { 
+                        trigger: 'item',
+                        backgroundColor: 'rgba(255,255,255,0.95)',
+                        formatter: function(params) {
+                            return `<div class="font-bold text-gray-800">${params.name}</div>
+                                    <div class="text-sm mt-1">${params.marker} Revenue: <b class="text-gray-900">${formatIDR(params.value)}</b> (${params.percent}%)</div>`;
+                        }
+                    }, 
+                    legend: { bottom: '0', icon: 'circle' },
                     color: ['#0000CD', '#228B22', '#808080', '#4169E1', '#32CD32'],
                     series: [{ type: 'pie', radius: ['40%', '70%'], data: Object.entries(akunMap).map(e => ({ name: "Akun " + e[0], value: e[1] })) }]
                 });
 
                 charts.analysisLine.setOption({
-                    tooltip: { trigger: 'axis' }, grid: { top: '10%', left: '8%', right: '4%', bottom: '15%', containLabel: true },
-                    xAxis: { type: 'category', boundaryGap: false, data: dates }, yAxis: { type: 'log', logBase: 10, axisLabel: { formatter: formatExponential } },
-                    color: ['#808080'], series: [{ type: 'line', data: dates.map(d => DataEngine.safeScale(dateMap[d].rev * 1.05)), lineStyle: { width: 3, type: 'dashed' }, symbol: 'none' }]
+                    tooltip: { 
+                        trigger: 'axis',
+                        backgroundColor: 'rgba(255,255,255,0.95)',
+                        formatter: function(params) {
+                            return `<div class="font-bold border-b pb-1 mb-2 text-gray-800">${params[0].name}</div>
+                                    <div class="flex justify-between items-center gap-4 text-sm">
+                                        <span>${params[0].marker} Performance Forecast</span>
+                                        <b class="text-gray-900">${formatIDR(params[0].data)}</b>
+                                    </div>`;
+                        }
+                    }, 
+                    grid: { top: '10%', left: '8%', right: '4%', bottom: '15%', containLabel: true },
+                    xAxis: { type: 'category', boundaryGap: false, data: dates }, 
+                    yAxis: { type: 'log', logBase: 10, axisLabel: { formatter: formatExponential } },
+                    color: ['#808080'], 
+                    series: [{ type: 'line', data: dates.map(d => DataEngine.safeScale(dateMap[d].rev * 1.05)), lineStyle: { width: 3, type: 'dashed' }, symbol: 'none' }]
                 });
 
                 const tbody = document.getElementById('data-table-body');
@@ -841,23 +914,139 @@
         function clearDashboardUI() { /* Disingkat untuk efisiensi code block */ }
 
         function renderAdvancedAnalytics(dataset, globalDates) {
-            // (Logika analytics persis sama dengan kode sebelumnya)
-            // Sengaja disingkat sebagian agar fokus pada API Fetching
+            
+            // KL / UNIT SECTION
             const klMap = {};
             dataset.forEach(r => {
                 const kl = r['KODE KL/UNIT/SATKER'] || 'Unknown';
-                if(!klMap[kl]) klMap[kl] = { revIDR: 0, revUSD: 0, txns: 0, totalRev: 0 };
+                if(!klMap[kl]) klMap[kl] = { revIDR: 0, revUSD: 0, txns: 0, totalRev: 0, seriesData: {} };
                 if(r['MATA UANG'] === 'USD') klMap[kl].revUSD += r._cleanRevenue; else klMap[kl].revIDR += r._cleanRevenue;
                 klMap[kl].totalRev += r._cleanRevenue; klMap[kl].txns += 1;
+                
+                if(!klMap[kl].seriesData[r._groupedDate]) klMap[kl].seriesData[r._groupedDate] = 0;
+                klMap[kl].seriesData[r._groupedDate] += r._cleanRevenue;
             });
             const klArray = Object.entries(klMap).map(([k, v]) => ({ id: k, ...v })).sort((a,b) => b.totalRev - a.totalRev);
             document.getElementById('kl-kpi-1').innerText = klArray.length;
-            
+            const top5KL = klArray.slice(0, 5);
+
+            charts.klLine.setOption({
+                tooltip: { 
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    formatter: function(params) {
+                        let res = `<div class="font-bold border-b pb-1 mb-2 text-gray-800">${params[0].name}</div>`;
+                        params.forEach(p => {
+                            res += `<div class="flex justify-between items-center gap-4 text-sm">
+                                        <span class="truncate max-w-[150px]">${p.marker} ${p.seriesName}</span>
+                                        <b class="text-gray-900">${formatIDR(p.data)}</b>
+                                    </div>`;
+                        });
+                        return res;
+                    }
+                },
+                legend: { data: top5KL.map(p => p.id.substring(0,10)+'...'), top: 0 },
+                grid: { top: '15%', left: '8%', right: '5%', bottom: '10%', containLabel: true },
+                xAxis: { type: 'category', boundaryGap: false, data: globalDates },
+                yAxis: { type: 'log', logBase: 10, axisLabel: { formatter: formatExponential } },
+                series: top5KL.map((klData, idx) => ({
+                    name: klData.id.substring(0,10)+'...',
+                    type: 'line',
+                    data: globalDates.map(d => DataEngine.safeScale(klData.seriesData[d] || 0))
+                })),
+                color: ['#228B22', '#0000CD', '#808080', '#4169E1', '#32CD32']
+            });
+
             new TableVirtualizer('table-kl-body', klArray, (row) => `
                 <td class="p-3"><span class="truncate-cell" title="${row.id}">${row.id}</span></td>
                 <td class="p-3">${row.txns}</td>
-                <td class="p-3 text-right text-[#228B22]">${formatIDR(row.revIDR)}<br><span class="text-[#0000CD]">${formatUSD(row.revUSD)}</span></td>
+                <td class="p-3 text-right text-[#228B22] font-semibold">${formatIDR(row.revIDR)}${row.revUSD > 0 ? '<br><span class="text-[#0000CD]">'+formatUSD(row.revUSD)+'</span>' : ''}</td>
             `, 'kl-pagination', 10);
+
+            // NTPN SECTION
+            const ntpnMap = {};
+            dataset.forEach(r => {
+                const ntpn = r['NTPN'] || 'Unknown';
+                if(!ntpnMap[ntpn]) ntpnMap[ntpn] = { revIDR: 0, revUSD: 0, totalRev: 0, txns: 0 };
+                if (r['MATA UANG'] === 'USD') ntpnMap[ntpn].revUSD += r._cleanRevenue; else ntpnMap[ntpn].revIDR += r._cleanRevenue;
+                ntpnMap[ntpn].totalRev += r._cleanRevenue; ntpnMap[ntpn].txns += 1;
+            });
+            const ntpnArray = Object.entries(ntpnMap).map(([k, v]) => ({ id: k, ...v })).sort((a,b) => b.totalRev - a.totalRev);
+            document.getElementById('ntpn-kpi-1').innerText = formatNumber(ntpnArray.length);
+            document.getElementById('ntpn-kpi-2').innerText = ntpnArray.length > 0 ? ntpnArray[0].id : '-';
+            const top10NTPN = ntpnArray.slice(0, 10);
+
+            charts.ntpnBar.setOption({
+                tooltip: { 
+                    trigger: 'axis', 
+                    axisPointer: { type: 'shadow' },
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    formatter: function(params) {
+                        let res = `<div class="font-bold border-b pb-1 mb-2 text-gray-800">${params[0].name}</div>`;
+                        params.forEach(p => {
+                            let valStr = p.seriesName.includes('USD') ? formatUSD(p.data) : formatIDR(p.data);
+                            res += `<div class="flex justify-between items-center gap-4 text-sm">
+                                        <span>${p.marker} ${p.seriesName}</span>
+                                        <b class="text-gray-900">${valStr}</b>
+                                    </div>`;
+                        });
+                        return res;
+                    }
+                },
+                legend: { data: ['IDR Revenue', 'USD Revenue'], top: 0, textStyle: { fontSize: 10 } },
+                grid: { top: '15%', left: '3%', right: '4%', bottom: '15%', containLabel: true },
+                xAxis: { type: 'category', data: top10NTPN.map(k => k.id.substring(0, 8) + '...'), axisLabel: { rotate: 30 } },
+                yAxis: { type: 'log', logBase: 10, axisLabel: { formatter: formatExponential } }, 
+                color: ['#0000CD', '#228B22'],
+                series: [
+                    { name: 'IDR Revenue', type: 'bar', data: top10NTPN.map(k => DataEngine.safeScale(k.revIDR)), itemStyle: { borderRadius: [4, 4, 0, 0] } },
+                    { name: 'USD Revenue', type: 'bar', data: top10NTPN.map(k => DataEngine.safeScale(k.revUSD)), itemStyle: { borderRadius: [4, 4, 0, 0] } }
+                ]
+            });
+
+            new TableVirtualizer('table-ntpn-body', ntpnArray, (row) => `
+                <td class="p-3"><span class="truncate-cell" title="${row.id}">${row.id}</span></td>
+                <td class="p-3">${formatNumber(row.txns)}</td>
+                <td class="p-3 text-right font-semibold text-[#0000CD]">${row.revIDR > 0 ? formatIDR(row.revIDR) : ''}${row.revIDR > 0 && row.revUSD > 0 ? '<br>' : ''}${row.revUSD > 0 ? formatUSD(row.revUSD) : ''}</td>
+            `, 'ntpn-pagination', 10);
+
+            // WAJIB BAYAR SECTION
+            const wajibMap = {};
+            dataset.forEach(r => {
+                const w = r['NAMA WAJIB BAYAR / SETOR'] || 'Unknown';
+                if(!wajibMap[w]) wajibMap[w] = { revIDR: 0, revUSD: 0, txns: 0, totalRev: 0 };
+                if (r['MATA UANG'] === 'USD') wajibMap[w].revUSD += r._cleanRevenue; else wajibMap[w].revIDR += r._cleanRevenue;
+                wajibMap[w].totalRev += r._cleanRevenue; wajibMap[w].txns += 1;
+            });
+            const wajibArray = Object.entries(wajibMap).map(([k, v]) => ({ id: k, ...v })).sort((a,b) => b.totalRev - a.totalRev);
+            document.getElementById('wajib-kpi-1').innerText = formatNumber(wajibArray.length);
+            document.getElementById('wajib-kpi-2').innerText = wajibArray.length > 0 ? wajibArray[0].id : '-';
+            
+            const pieDataWajib = wajibArray.slice(0, 7).map(e => ({ name: e.id, value: e.totalRev }));
+            charts.wajibPie.setOption({
+                tooltip: { 
+                    trigger: 'item', 
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    formatter: function(params) {
+                        return `<div class="font-bold text-gray-800">${params.name}</div>
+                                <div class="text-sm mt-1">${params.marker} Revenue: <b class="text-gray-900">${formatIDR(params.value)}</b> (${params.percent}%)</div>`;
+                    }
+                },
+                legend: { type: 'scroll', orient: 'vertical', right: 10, top: 20, bottom: 20, textStyle: { fontSize: 10 } },
+                color: ['#0000CD', '#228B22', '#808080', '#4169E1', '#32CD32', '#6495ED', '#8FBC8F', '#D3D3D3'],
+                series: [{
+                    name: 'Segment', type: 'pie', radius: ['40%', '70%'], center: ['40%', '50%'],
+                    itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+                    label: { show: true, formatter: '{b}\n{d}%', color: '#666' },
+                    data: pieDataWajib
+                }]
+            });
+            
+            new TableVirtualizer('table-wajib-body', wajibArray, (row) => `
+                <td class="p-3"><span class="truncate-cell" title="${row.id}">${row.id}</span></td>
+                <td class="p-3">${formatNumber(row.txns)}</td>
+                <td class="p-3 text-right font-semibold text-gray-800">${row.revIDR > 0 ? formatIDR(row.revIDR) : ''}${row.revIDR > 0 && row.revUSD > 0 ? '<br>' : ''}${row.revUSD > 0 ? '<span class="text-[#0000CD]">'+formatUSD(row.revUSD)+'</span>' : ''}</td>
+            `, 'wajib-pagination', 10);
         }
 
         function setStatus(isLive) {
@@ -903,7 +1092,7 @@
             } catch (err) {
                 console.error("Koneksi API Gagal:", err.message);
                 setStatus(false);
-                loaderTitle.innerText = "Gagal Konek API. Memuat Mock Data...";
+                loaderTitle.innerText = "Menggunakan Mockup Data CSV...";
                 
                 originalDataset = MOCK_DATA;
                 activeDataset = [...MOCK_DATA];
