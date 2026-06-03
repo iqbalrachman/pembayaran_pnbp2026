@@ -323,37 +323,37 @@
             </div>
             <!-- 1. KODE KL/UNIT/SATKER Section -->
             <section id="section-kode-kl" class="flex flex-col gap-4 scroll-mt-24">
-                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i class="ph-fill ph-buildings text-[#228B22]"></i> KODE KL/UNIT/SATKER Analytics</h3>
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i class="ph-fill ph-buildings text-[#228B22]"></i> KODE - SATKER Analytics</h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition hover:shadow-md">
-                         <p class="text-sm text-gray-500">Active KL/Satker Units</p>
+                         <p class="text-sm text-gray-500">Active Kode - Satker Units</p>
                          <h4 class="text-2xl font-bold text-gray-900" id="kl-kpi-1">0</h4>
                      </div>
                      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition hover:shadow-md">
-                         <p class="text-sm text-gray-500">Avg Revenue per Unit</p>
+                         <p class="text-sm text-gray-500">Avg Revenue per Satker</p>
                          <h4 class="text-xl font-bold text-[#228B22]" id="kl-kpi-2">Rp 0</h4>
                      </div>
                      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition hover:shadow-md">
-                         <p class="text-sm text-gray-500">Top Performing Unit</p>
+                         <p class="text-sm text-gray-500">Top Performing Satker</p>
                          <h4 class="text-lg font-bold text-gray-700 truncate" id="kl-kpi-3" title="">-</h4>
                      </div>
                 </div>
                 
                 <div class="flex flex-col xl:flex-row gap-4 h-auto xl:h-[400px]">
                      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex-[6] relative flex flex-col">
-                         <h4 class="text-sm font-semibold mb-2">Unit Performance Trends (Log Scale)</h4>
+                         <h4 class="text-sm font-semibold mb-2">Satker Performance Trends (Log Scale)</h4>
                          <div id="chart-kl-line" class="flex-1 w-full h-full min-h-[300px]"></div>
                      </div>
                      
                      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex-[4] flex flex-col h-[350px] xl:h-auto">
-                         <h4 class="text-sm font-semibold mb-2">Unit Details</h4>
+                         <h4 class="text-sm font-semibold mb-2">Satker Details</h4>
                          <div class="overflow-y-auto flex-1 custom-scrollbar">
                              <table class="table-fixed text-left text-xs">
                                  <thead class="bg-gray-50 text-gray-500 sticky top-0 z-10">
                                      <tr>
-                                         <th class="p-3 w-[45%]">KODE KL/UNIT</th>
-                                         <th class="p-3 w-[20%]">Txns</th>
+                                         <th class="p-3 w-[45%]">KODE - SATKER</th>
+                                         <th class="p-3 w-[20%]">Transaksi</th>
                                          <th class="p-3 w-[35%] text-right">Revenue</th>
                                      </tr>
                                  </thead>
@@ -366,15 +366,15 @@
             </section>
             <!-- 2. NTPN Section -->
             <section id="section-ntpn" class="flex flex-col gap-4 mt-8 scroll-mt-24">
-                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i class="ph-fill ph-barcode text-[#0000CD]"></i> NTPN Performance Analysis</h3>
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i class="ph-fill ph-barcode text-[#0000CD]"></i> Layanan Performance Analysis</h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition hover:shadow-md">
-                         <p class="text-sm text-gray-500">Total Unique NTPN</p>
+                         <p class="text-sm text-gray-500">Total Unique Layanan</p>
                          <h4 class="text-2xl font-bold text-gray-900" id="ntpn-kpi-1">0</h4>
                      </div>
                      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition hover:shadow-md">
-                         <p class="text-sm text-gray-500">Highest Volume NTPN</p>
+                         <p class="text-sm text-gray-500">Highest Volume Layanan</p>
                          <h4 class="text-xl font-bold text-[#0000CD] truncate" id="ntpn-kpi-2" title="">-</h4>
                      </div>
                      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden transition hover:shadow-md">
@@ -387,18 +387,18 @@
                 <div class="flex flex-col xl:flex-row gap-4 h-auto xl:h-[400px]">
                      <!-- Bar Chart -->
                      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex-[6] relative flex flex-col">
-                         <h4 class="text-sm font-semibold mb-2">NTPN Distribution (IDR & USD)</h4>
+                         <h4 class="text-sm font-semibold mb-2">Layanan Distribution (IDR & USD)</h4>
                          <div id="chart-ntpn-bar" class="flex-1 w-full h-full min-h-[300px]"></div>
                      </div>
                      
                      <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex-[4] flex flex-col h-[350px] xl:h-auto">
-                         <h4 class="text-sm font-semibold mb-2">Detailed NTPN Orders</h4>
+                         <h4 class="text-sm font-semibold mb-2">Detailed Layanan Orders</h4>
                          <div class="overflow-y-auto flex-1 custom-scrollbar">
                              <table class="table-fixed text-left text-xs">
                                  <thead class="bg-gray-50 text-gray-500 sticky top-0 z-10">
                                      <tr>
-                                         <th class="p-3 w-[45%]">NTPN</th>
-                                         <th class="p-3 w-[20%]">Txns</th>
+                                         <th class="p-3 w-[45%]">Layanan</th>
+                                         <th class="p-3 w-[20%]">Transaksi</th>
                                          <th class="p-3 w-[35%] text-right">Revenue</th>
                                      </tr>
                                  </thead>
@@ -438,7 +438,7 @@
                                  <thead class="bg-gray-50 text-gray-500 sticky top-0 z-10">
                                      <tr>
                                          <th class="p-3 w-[45%]">WAJIB BAYAR</th>
-                                         <th class="p-3 w-[20%]">Txns</th>
+                                         <th class="p-3 w-[20%]">Transaksi</th>
                                          <th class="p-3 w-[35%] text-right">Revenue</th>
                                      </tr>
                                  </thead>
