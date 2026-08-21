@@ -9,8 +9,8 @@ const CONFIG = {
      * URL Google Apps Script Web App Anda.
      * Pastikan URL berakhiran /exec
      */
-    /** APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbw76CDPCPF02rLa1_iR4lTKCOPN5bNUR5RG952AOnagf2ROWO6U2LxoLCeiuQP7V0H1pg/exec",**/
     APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwpFG--InBcLGHR4X_4CWErNCcWnmGHIdXfJwDlq2sSBi-YCuOcvytSdjDU-rJL50DQUQ/exec",
+
     /**
      * Judul dashboard
      */
